@@ -9,8 +9,6 @@ analysis tasks. We demonstrate an innovative approach that combines contrastive 
 can explicitly improve class variance and invariance in the embedding space, especially for
 some fuzzy speech properties. Additionally, to the best of our knowledge, this work is the first that explores the use of Barlow Twins
 in the speech domain.
----
-### Pipeline Overview
 
 ---
 ### Installation
