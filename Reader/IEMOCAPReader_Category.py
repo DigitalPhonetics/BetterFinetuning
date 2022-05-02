@@ -1,9 +1,3 @@
-"""
-
-Read IEMOCAP Data
-* In order to compare
-
-"""
 import glob
 import json
 import os

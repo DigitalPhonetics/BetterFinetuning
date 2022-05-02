@@ -1,5 +1,4 @@
 """
-
 Read VOiCE Data: https://iqtlabs.github.io/voices/Lab41-SRI-VOiCES_README/
 source-16k contains the original librispeech source audio.
 distant-16k contains the VOiCES data
@@ -7,7 +6,6 @@ distractors : distractor noise recordings with no foreground audio for all rooms
 room-response : recorded sound to determine room-response for all rooms
 speech : for each room, recordings of foreground audio with babble, music, television or no distractor noise, arranged by speaker ID in each subfolder
 Note that We only use speech directory.
-
 
 """
 import os

@@ -1,6 +1,3 @@
-"""
-For Speaker identification task, we will use train-clean-100, train-clean-360, train-other-500.
-"""
 import os
 import tqdm
 import pickle
