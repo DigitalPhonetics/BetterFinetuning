@@ -34,14 +34,15 @@ pip install -r requirements.txt
 ### Model Training
 ```
 # For example, finetuning the contrastive model for speech emotion classification with 10 epoches
+# If there is an existing checkpoint and you want to use, please model_path in the script
 cd ContrastiveLearning/Siamese_train_pipeline.py
-python Siamese_train_pipeline.py emotion 10
+python Siamese_train_pipeline.py emotion 10 model_path
 ```
 
 ```
 # For example, finetuning the non-contrastive model for background sound classification with 10 epoches
 cd BarlowTwins/BarlowTwins_train_pipeline.py
-python BarlowTwins_train_pipeline.py noise 10
+python BarlowTwins_train_pipeline.py noise 10 model_path
 ```
 
 ---
