@@ -1,5 +1,5 @@
 # SpeechRepresentationFinetuning
-****We are releasing the source code, but will keep update the repository until in the end of May.****
+****_We are releasing the source code, but will keep update the repository until in the end of May._****
 
 Code accompanying our paper on finetuning self-supervised general speech representations with a combination of contrastive and non-contrastive methods.
 
@@ -33,16 +33,16 @@ pip install -r requirements.txt
 ---
 ### Model Training
 ```
-# For example, finetuning the contrastive model for speech emotion classification with 10 epoches
+# For example, finetuning the contrastive model for speech emotion classification with 10 epochs
 # If there is an existing checkpoint and you want to use, please model_path in the script
 cd ContrastiveLearning/Siamese_train_pipeline.py
 python Siamese_train_pipeline.py emotion 10 model_path
 ```
 
 ```
-# For example, finetuning the non-contrastive model for background sound classification with 10 epoches
+# For example, finetuning the non-contrastive model for background sound classification with 100 epochs
 cd BarlowTwins/BarlowTwins_train_pipeline.py
-python BarlowTwins_train_pipeline.py noise 10 model_path
+python BarlowTwins_train_pipeline.py noise 100 model_path
 ```
 
 ---
