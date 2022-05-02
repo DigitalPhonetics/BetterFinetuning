@@ -33,7 +33,6 @@ class VOiCESReader:
 
     def process(self) -> dict:
         data = dict()
-        # 1. check if data cache
         if (
             os.path.exists(os.path.join(self.save_dir, "VOiCES_data_cache.pkl"))
             and not self.rebuild_data_cache
@@ -63,8 +62,6 @@ class VOiCESReader:
                 print(error)
                 pass
 
-        # 5. build cache for existed data: save_dir
-        # 6. condition for rebuild_data_dict
         if (
             not os.path.exists(os.path.join(self.save_dir, "VOiCES_data_cache.pkl"))
             or self.rebuild_data_cache
