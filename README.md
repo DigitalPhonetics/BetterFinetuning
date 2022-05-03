@@ -28,36 +28,39 @@ pip install -r requirements.txt
 
 ### Data Preprocessing 
 ```
-# TBD: Will add the detail of datasets later
+# TBD: Will add the details on the datasets later
 ```
 ---
 ### Model Training
-For example, finetuning the contrastive model for speech emotion classification with 10 epochs
-If there is an existing checkpoint and you want to use, please model_path in the script
+Example 1: Finetuning the contrastive model for speech emotion classification with 10 epochs.
+If there is an existing checkpoint that you want to use, please change model_path in the script.
 ```
-cd ContrastiveLearning/Siamese_train_pipeline.py
+cd ContrastiveLearning/
 python Siamese_train_pipeline.py emotion 10 model_path
 ```
 
-For example, finetuning the non-contrastive model for background sound classification with 100 epochs
+Example 2: Finetuning the non-contrastive model for background sound classification with 100 epochs.
 ```
-cd BarlowTwins/BarlowTwins_train_pipeline.py
+cd BarlowTwins/
 python BarlowTwins_train_pipeline.py noise 100 model_path
 ```
 
 ---
 ### Evaluation
-
-If you want to evaluate the centroid distance of gender embedding finetuned with contrastive approach
-You will need to put the output embedding file within the reposotory 
 ```
-cd Evaluation/centroid_distance.py
+cd Evaluation/
+```
+
+Example 1: If you want to evaluate the centroid distance of gender embedding finetuned with the 
+contrastive approach, you will need to put the output embedding file within the repository, and 
+specify the file path.
+```
 python centriod_distance.py contrastive gender file_path
 ```
 
-If you want to evaluate the Davies-Bouldin Index of emotion embedding finetuned with non-contrastive/barlowtwins approach
-You will need to put the output embedding file within the reposotory, and specify the file path
+Example 2: If you want to evaluate the Davies-Bouldin Index of emotion embedding finetuned with 
+non-contrastive/barlowtwins approach, you will need to put the output embedding file within the 
+reposoitory, and specify the file path.
 ```
-cd Evaluation/davies_bouldin.py
 python davies_bouldin.py barlowtwins emotion file_path
 ```
