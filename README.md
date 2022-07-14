@@ -1,5 +1,4 @@
 # Speech Representation Adjustment
-****_We will keep updating the repository throughout May, this is not the final state._****
 
 This is the Code accompanying our paper on finetuning self-supervised general speech representations with a combination of contrastive and non-contrastive methods.
 
@@ -9,6 +8,8 @@ analysis tasks. Further we show an approach that combines contrastive and non-co
 and can explicitly improve cross-class variance and within-class invariance in the embedding space, especially for
 some fuzzy speech properties. Additionally, to the best of our knowledge, this work is the first that explores the use of Barlow Twins
 in the speech domain.
+
+The code is not fully complete yet, we are still cleaning up parts. All of the experiments / training code for the wav2vec backbone are public already. The alternative HuBert backbone as well as the data handling pipeline will come soon™
 
 ---
 ### Installation
