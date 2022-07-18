@@ -57,13 +57,13 @@ class IEMOCAPCategoryReader:
         emotion_attribute = dict()
 
         if (
-            os.path.exists(
-                os.path.join(self.save_dir, "IEMOCAP_categorical_data_cache.json")
-            )
-            and not self.rebuild_cache
+                os.path.exists(
+                    os.path.join(self.save_dir, "IEMOCAP_categorical_data_cache.json")
+                )
+                and not self.rebuild_cache
         ):
             with open(
-                os.path.join(self.save_dir, "IEMOCAP_categorical_data_cache.json"), "r"
+                    os.path.join(self.save_dir, "IEMOCAP_categorical_data_cache.json"), "r"
             ) as fp:
                 data = json.load(fp)
             print("Prepared IEMOCAP data.")
@@ -153,13 +153,13 @@ class IEMOCAPCategoryReader:
                 continue
 
         if (
-            not os.path.exists(
-                os.path.join(self.save_dir, "IEMOCAP_categorical_data_cache.json")
-            )
-            or self.rebuild_cache
+                not os.path.exists(
+                    os.path.join(self.save_dir, "IEMOCAP_categorical_data_cache.json")
+                )
+                or self.rebuild_cache
         ):
             with open(
-                os.path.join(self.save_dir, "IEMOCAP_categorical_data_cache.json"), "w"
+                    os.path.join(self.save_dir, "IEMOCAP_categorical_data_cache.json"), "w"
             ) as fp:
                 json.dump(data, fp)
             print(

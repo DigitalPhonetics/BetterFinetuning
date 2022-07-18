@@ -14,25 +14,25 @@ from torch import optim
 from torch.cuda.amp import autocast
 from torch.utils.data import DataLoader
 
-from Combine.models import BarlowTwins_Contrastive
-from ContrastiveLearning.CommonVoice_TIMIT_AgeDataset import (
+from Training.Combined import BarlowTwins_Contrastive
+from Training.ContrastiveLearning import (
     AgeDataset,
     generate_cv_timit_age_samples,
 )
-from ContrastiveLearning.CommonVoice_TIMIT_GenderDataset import (
+from Training.ContrastiveLearning import (
     GenderDataset,
     generate_cv_timit_gender_samples,
 )
-from ContrastiveLearning.EmotionDataset import (
-    UnifiedEmotionDataset,
-    generate_emotion_samples,
-)
-from ContrastiveLearning.IEMOCAPDataset import IEMOCAPDataset, generate_iemocap_samples
-from ContrastiveLearning.LibrispeechDataset import (
+from Training.ContrastiveLearning import IEMOCAPDataset, generate_iemocap_samples
+from Training.ContrastiveLearning import (
     LibrispeechDataset,
     generate_librispeech_samples,
 )
-from ContrastiveLearning.NoiseDataset import (
+from Training.ContrastiveLearning import (
+    UnifiedEmotionDataset,
+    generate_emotion_samples,
+)
+from Training.ContrastiveLearning import (
     VOiCESSiameseDataset,
     generate_noise_samples,
 )
@@ -63,8 +63,6 @@ def train(model, device, train_loader, optimizer, epoch, log_interval):
             positive.to(device),
             negative.to(device),
         )
-        # clear out the gradients of all Variables
-        # in this optimizer
         optimizer.zero_grad()
         anchor_out, positive_out, negative_out = model(anchor, positive, negative)
         # Extract embedding intermediately from the model perform best
@@ -77,7 +75,6 @@ def train(model, device, train_loader, optimizer, epoch, log_interval):
         combined_loss = model.combine_loss(barlowtwins_loss, triplet_loss)
         losses.append(combined_loss.item())
 
-        # disabled gradient calculation
         with torch.no_grad():
             p_distance = _get_cosine_distance(anchor_out, positive_out)
             positive_distances.append(torch.mean(p_distance).item())
@@ -93,7 +90,7 @@ def train(model, device, train_loader, optimizer, epoch, log_interval):
             # the threshold here can be adjusted
 
             positive_results = (
-                p_distance < threshold
+                    p_distance < threshold
             )  # implies correct similarity/distance
             positive_accuracy += torch.sum(positive_results).item()
 
@@ -227,23 +224,23 @@ def test(model, device, test_loader, log_interval=None):
 
 
 def main(
-    input_path,
-    speech_property,
-    batch_size,
-    output_size,
-    lambd=0.01,
-    num_epoches=100,
-    rebuild_dataloaders_cache=False,
-    use_cuda=True,
+        input_path,
+        speech_property,
+        batch_size,
+        output_size,
+        lambd=0.01,
+        num_epoches=100,
+        rebuild_dataloaders_cache=False,
+        use_cuda=True,
 ):
-    cache_dir = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/contrastive_dataloader_cache"
+    cache_dir = "working_dir/contrastive_dataloader_cache"
 
     device = torch.device("cuda" if use_cuda else "cpu")
     print("Using Device: ", device)
 
     if speech_property == "Noise":
         # Train and Test dataloader
-        model_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/models/noise_combined/"
+        model_path = "working_dir/models/noise_combined/"
         margin = 1.0
         barlowtwins_lambd = 0.00051
         learn_rate = 0.0001
@@ -279,7 +276,7 @@ def main(
         )
 
     if speech_property == "Emotion":
-        model_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/models/emotion_combined/"
+        model_path = "working_dir/models/emotion_combined/"
         margin = 1.0
         barlowtwins_lambd = 0.00051
         learn_rate = 0.0001
@@ -303,7 +300,7 @@ def main(
         )
 
     if speech_property == "IEMOCAP":
-        model_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/models/iemocap_combined/"
+        model_path = "working_dir/models/iemocap_combined/"
         margin = 1.0
         barlowtwins_lambd = 0.00051
         learn_rate = 0.0001
@@ -327,10 +324,10 @@ def main(
         )
 
     if speech_property == "Gender":
-        model_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/models/gender_combined/"
+        model_path = "working_dir/models/gender_combined/"
         # parameter
-        cv_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/wav2vec_output/CommonVoice_Dataset_enc_and_transformer_mean.pkl"
-        timit_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/wav2vec_output/TIMIT_enc_and_transformer_mean.pkl"
+        cv_path = "working_dir/wav2vec_output/CommonVoice_Dataset_enc_and_transformer_mean.pkl"
+        timit_path = "working_dir/wav2vec_output/TIMIT_enc_and_transformer_mean.pkl"
 
         barlowtwins_lambd = 0.00051
         margin = 1.0
@@ -362,15 +359,15 @@ def main(
         )
 
     if speech_property == "Age":
-        model_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/models/age_combined/"
+        model_path = "working_dir/models/age_combined/"
         # parameter
         barlowtwins_lambd = 0.00051
         margin = 1.0
         learn_rate = 0.0001
         decay = 0.0005
 
-        cv_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/wav2vec_output/CommonVoice_Dataset_enc_and_transformer_mean.pkl"
-        timit_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/wav2vec_output/TIMIT_enc_and_transformer_mean.pkl"
+        cv_path = "working_dir/wav2vec_output/CommonVoice_Dataset_enc_and_transformer_mean.pkl"
+        timit_path = "working_dir/wav2vec_output/TIMIT_enc_and_transformer_mean.pkl"
 
         train_age, test_age = generate_cv_timit_age_samples(
             cv_path=cv_path, timit_path=timit_path
@@ -392,7 +389,7 @@ def main(
         )
 
     if speech_property == "speaker_librispeech":
-        model_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/models/SID_combined/"
+        model_path = "working_dir/models/SID_combined/"
         margin = 1.0
         barlowtwins_lambd = 0.00051
         learn_rate = 0.0001
@@ -554,7 +551,7 @@ def extract_embedding(old_dict_path, file_name, embeddings, new_dict_save_path):
     for idx, batch in enumerate(embeddings):
         anchors, logid_a, positives, logid_p, negatives, logid_n = batch
         for idx, (a, log_a, p, log_p, n, log_n) in enumerate(
-            zip(anchors, logid_a, positives, logid_p, negatives, logid_n)
+                zip(anchors, logid_a, positives, logid_p, negatives, logid_n)
         ):
             # convert back to numpy array so we can load data in cup-only machine
             a = a.detach().cpu().numpy()
@@ -569,10 +566,10 @@ def extract_embedding(old_dict_path, file_name, embeddings, new_dict_save_path):
             # dict_info[log_n].update({"barlow_contrastive_n": n})
 
     with open(
-        os.path.join(
-            new_dict_save_path, "{}_barlow_contrastive_embedding.pkl".format(file_name)
-        ),
-        "wb",
+            os.path.join(
+                new_dict_save_path, "{}_barlow_contrastive_embedding.pkl".format(file_name)
+            ),
+            "wb",
     ) as fp:
         pickle.dump(dict_info, fp)
     print("Saved embedding to {}".format(new_dict_save_path))
@@ -580,7 +577,7 @@ def extract_embedding(old_dict_path, file_name, embeddings, new_dict_save_path):
 
 if __name__ == "__main__":
     # TODO: remove by argparse later
-    NoiseType_cache_path = "/mount/arbeitsdaten/synthesis/chenci/thesis_prosody_embedding/wav2vec_output/VOiCES_enc_and_transformer_mean.pkl"
+    NoiseType_cache_path = "working_dir/wav2vec_output/VOiCES_enc_and_transformer_mean.pkl"
     embedding_save_path = ""
     # noise data
 

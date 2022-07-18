@@ -20,7 +20,7 @@ AGE = {
 
 class CommonVoiceReader:
     def __init__(
-        self, data_path, save_dir, rebuild_data_cache, reduce_data=True
+            self, data_path, save_dir, rebuild_data_cache, reduce_data=True
     ) -> None:
         self.data_path = str(data_path)
         self.rebuild_data_cache = rebuild_data_cache
@@ -31,11 +31,11 @@ class CommonVoiceReader:
         data = dict()
         # 1. check if data cache
         if (
-            os.path.exists(os.path.join(self.save_dir, "CommonVoice_data_cache_1.pkl"))
-            and not self.rebuild_data_cache
+                os.path.exists(os.path.join(self.save_dir, "CommonVoice_data_cache_1.pkl"))
+                and not self.rebuild_data_cache
         ):
             with open(
-                os.path.join(self.save_dir, "CommonVoice_data_cache.pkl"), "rb"
+                    os.path.join(self.save_dir, "CommonVoice_data_cache.pkl"), "rb"
             ) as fp:
                 data = pickle.load(fp)
 
@@ -88,13 +88,13 @@ class CommonVoiceReader:
                 pass
 
         if (
-            not os.path.exists(
-                os.path.join(self.save_dir, "CommonVoice_data_cache.pkl")
-            )
-            or self.rebuild_data_cache
+                not os.path.exists(
+                    os.path.join(self.save_dir, "CommonVoice_data_cache.pkl")
+                )
+                or self.rebuild_data_cache
         ):
             with open(
-                os.path.join(self.save_dir, "CommonVoice_data_cache.pkl"), "wb"
+                    os.path.join(self.save_dir, "CommonVoice_data_cache.pkl"), "wb"
             ) as fp:
                 pickle.dump(data, fp)
             print(

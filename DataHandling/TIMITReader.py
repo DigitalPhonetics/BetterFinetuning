@@ -2,14 +2,13 @@
 Get Age & Gender Data from TIMIT
 
 """
-import os
-import tqdm
-import json
-import csv
 import glob
-import torchaudio
-import pandas as pd
+import json
+import os
 from pathlib import Path
+
+import pandas as pd
+import tqdm
 
 # Relabel to make it has same label in CommonVoice
 
@@ -28,8 +27,8 @@ class TIMITReader:
     def process(self) -> dict:
         data = dict()
         if (
-            os.path.exists(os.path.join(self.save_dir, "TIMIT_data_cache.json"))
-            and not self.rebuild_data_cache
+                os.path.exists(os.path.join(self.save_dir, "TIMIT_data_cache.json"))
+                and not self.rebuild_data_cache
         ):
             with open(os.path.join(self.save_dir, "TIMIT_data_cache.json"), "r") as fp:
                 data = json.load(fp)
@@ -55,8 +54,8 @@ class TIMITReader:
         data_df = pd.DataFrame.from_dict(data, orient="index")
 
         if (
-            not os.path.exists(os.path.join(self.save_dir, "TIMIT_data_cache.json"))
-            or self.rebuild_data_cache
+                not os.path.exists(os.path.join(self.save_dir, "TIMIT_data_cache.json"))
+                or self.rebuild_data_cache
         ):
             with open(os.path.join(self.save_dir, "TIMIT_data_cache.json"), "w") as fp:
                 json.dump(data, fp)

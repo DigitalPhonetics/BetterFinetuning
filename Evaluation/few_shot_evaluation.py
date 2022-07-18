@@ -3,7 +3,6 @@ import pickle
 
 import numpy as np
 import pandas as pd
-
 # TODO: build official predictor
 # for now we use the result from training data and test data
 # training data as label data and testing data as unlabel data
@@ -37,7 +36,7 @@ def filter(data_dict):
 
 class FewShotEvaluation:
     def __init__(
-        self, shot_number, embed_type, label_name, train_result_path, test_result_path
+            self, shot_number, embed_type, label_name, train_result_path, test_result_path
     ):
         self.shot_number = shot_number
         self.embed_type = embed_type

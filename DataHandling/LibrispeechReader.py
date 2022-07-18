@@ -1,10 +1,11 @@
-import os
-import tqdm
-import pickle
 import glob
-import torchaudio
-import pandas as pd
+import os
+import pickle
 from pathlib import Path
+
+import pandas as pd
+import torchaudio
+import tqdm
 
 
 class LibrispeechReader:
@@ -40,8 +41,8 @@ class LibrispeechReader:
 
         # 1. check if data cache exist and if rebuild_data_cache is True
         if (
-            os.path.exists(os.path.join(self.save_dir, train_file_name))
-            and not self.rebuild_data_cache
+                os.path.exists(os.path.join(self.save_dir, train_file_name))
+                and not self.rebuild_data_cache
         ):
             with open(os.path.join(self.save_dir, train_file_name), "rb") as fp:
                 train_data = pickle.load(fp)
@@ -67,8 +68,8 @@ class LibrispeechReader:
         test_df = pd.DataFrame.from_dict(test_data, orient="index")
 
         if (
-            not os.path.exists(os.path.join(self.save_dir, train_file_name))
-            or self.rebuild_data_cache
+                not os.path.exists(os.path.join(self.save_dir, train_file_name))
+                or self.rebuild_data_cache
         ):
             with open(os.path.join(self.save_dir, train_file_name), "wb") as fp:
                 pickle.dump(train_data, fp)

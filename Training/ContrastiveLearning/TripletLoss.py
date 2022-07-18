@@ -13,11 +13,11 @@ class TripletLoss(nn.Module):
         self.margin = margin
 
     def forward(
-        self,
-        anchor_embeddings,
-        positive_embeddings,
-        negative_embeddings,
-        reduction="mean",  # "mean"
+            self,
+            anchor_embeddings,
+            positive_embeddings,
+            negative_embeddings,
+            reduction="mean",  # "mean"
     ):
         # Gender and Noise used reduction="mean"
 

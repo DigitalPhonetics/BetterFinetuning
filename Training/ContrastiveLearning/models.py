@@ -1,11 +1,13 @@
 import torch
 from torch import nn
+from transformers import HubertModel
 from transformers.models.wav2vec2.modeling_wav2vec2 import (
     Wav2Vec2Model,
     _compute_mask_indices,
 )
 
-from ContrastiveLearning.TripletLoss import TripletLoss
+import Training.config as config
+from Training.ContrastiveLearning.TripletLoss import TripletLoss
 
 
 class TripletLossNet(nn.Module):
@@ -35,7 +37,16 @@ class TripletLossNet(nn.Module):
         self.rnn = nn.RNN(
             input_size=512, hidden_size=256, num_layers=1, batch_first=True
         )
-        self.wav2vec_model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
+        if config.backbone == "wav2vec2":
+            self.backbone = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
+            self.backbone.fc = nn.Identity()
+        elif config.backbone == "hubert":
+            self.backbone = HubertModel.from_pretrained("facebook/hubert-base")
+            self.backbone.fc = nn.Identity()
+        else:
+            import sys
+            print("Invalid backbone selected!")
+            sys.exit()
         self.loss_layer = TripletLoss(margin)
         self.linear_layer = nn.Sequential(nn.Linear(512, self.output_size))
 
@@ -58,7 +69,7 @@ class TripletLossNet(nn.Module):
         # compute masked indices
         def _get_mask_time_indices(embedding):
             batch_size, raw_sequence_length = embedding.shape
-            sequence_length = self.wav2vec_model._get_feat_extract_output_lengths(
+            sequence_length = self.backbone._get_feat_extract_output_lengths(
                 raw_sequence_length
             )
             mask_time_indices = _compute_mask_indices(
@@ -68,7 +79,7 @@ class TripletLossNet(nn.Module):
             return mask_time_indices
 
         # batch_size = anchor.shape[0]
-        anchor_out = self.wav2vec_model(
+        anchor_out = self.backbone(
             anchor, mask_time_indices=_get_mask_time_indices(anchor)
         ).extract_features
         anchor_out = self.dropout(anchor_out)
@@ -77,14 +88,14 @@ class TripletLossNet(nn.Module):
         )  # = outputs.last_hidden_state ?
         anchor_out = self.projector(anchor_out)
 
-        positive_out = self.wav2vec_model(
+        positive_out = self.backbone(
             positive, mask_time_indices=_get_mask_time_indices(positive)
         ).extract_features
         positive_out = self.dropout(positive_out)
         positive_out = self.merged_strategy(hidden_states=positive_out)
         positive_out = self.projector(positive_out)
 
-        negative_out = self.wav2vec_model(
+        negative_out = self.backbone(
             negative, mask_time_indices=_get_mask_time_indices(negative)
         ).extract_features
         negative_out = self.dropout(negative_out)

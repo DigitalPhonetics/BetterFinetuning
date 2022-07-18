@@ -7,7 +7,6 @@ import librosa
 import librosa.core as lb
 import numpy
 import numpy as np
-import soundfile as sf
 import pyloudnorm as pyln
 import torch
 from torchaudio.transforms import MuLawDecoding
@@ -18,13 +17,13 @@ from torchaudio.transforms import Vad as VoiceActivityDetection
 
 class AudioPreprocessor:
     def __init__(
-        self,
-        input_sr,
-        output_sr=None,
-        melspec_buckets=80,
-        hop_length=256,
-        n_fft=1024,
-        cut_silence=False,
+            self,
+            input_sr,
+            output_sr=None,
+            melspec_buckets=80,
+            hop_length=256,
+            n_fft=1024,
+            cut_silence=False,
     ):
         """
         The parameters are by default set up to do well

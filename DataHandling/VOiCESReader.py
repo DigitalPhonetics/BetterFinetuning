@@ -8,13 +8,14 @@ speech : for each room, recordings of foreground audio with babble, music, telev
 Note that We only use speech directory.
 
 """
-import os
-import tqdm
-import pickle
 import glob
-import torchaudio
-import pandas as pd
+import os
+import pickle
 from pathlib import Path
+
+import pandas as pd
+import torchaudio
+import tqdm
 
 # distractor
 NOISE_TYPE_DICT = {
@@ -34,8 +35,8 @@ class VOiCESReader:
     def process(self) -> dict:
         data = dict()
         if (
-            os.path.exists(os.path.join(self.save_dir, "VOiCES_data_cache.pkl"))
-            and not self.rebuild_data_cache
+                os.path.exists(os.path.join(self.save_dir, "VOiCES_data_cache.pkl"))
+                and not self.rebuild_data_cache
         ):
             with open(os.path.join(self.save_dir, "VOiCES_data_cache.pkl"), "rb") as fp:
                 data = pickle.load(fp)
@@ -63,8 +64,8 @@ class VOiCESReader:
                 pass
 
         if (
-            not os.path.exists(os.path.join(self.save_dir, "VOiCES_data_cache.pkl"))
-            or self.rebuild_data_cache
+                not os.path.exists(os.path.join(self.save_dir, "VOiCES_data_cache.pkl"))
+                or self.rebuild_data_cache
         ):
             with open(os.path.join(self.save_dir, "VOiCES_data_cache.pkl"), "wb") as fp:
                 pickle.dump(data, fp)

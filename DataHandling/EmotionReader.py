@@ -114,7 +114,7 @@ class EmotionReader:
         if self.dataset_name == "Korean_Read_Speech_Corpus":
             # wave files
             wav_files = glob.glob("{}/dataset/*/*.wav".format(self.data_path))
-            label_path = "/mount/arbeitsdaten/synthesis/chenci/Datasets/Korean-Read-Speech-Corpus/dataset/Korean_Read_Speech_Corpus_sample.json"
+            label_path = "data_dir/Korean-Read-Speech-Corpus/dataset/Korean_Read_Speech_Corpus_sample.json"
             with open(label_path, "r") as fp:
                 labels = json.load(fp)
             airbnb = labels["AirbnbStudio"]
@@ -145,13 +145,13 @@ class EmotionReader:
             data = self.emotiontts_open_db_label(wav_files_1, wav_files_2)
 
         if self.dataset_name == "EMO-DB":
-            # /mount/arbeitsdaten/synthesis/chenci/Datasets/EMO-DB(de)/wav
+            # data_dir/EMO-DB(de)/wav
             wav_files = glob.glob("{}/wav/*.wav".format(self.data_path))
             data = self.EMODB_label(wav_files)
 
         if self.dataset_name == "Emotional_Speech_Dataset_Singapore":
             data = {}
-            # /mount/arbeitsdaten/synthesis/chenci/Datasets/Emotional_Speech_Dataset_Singapore/0001/Happy
+            # data_dir/Emotional_Speech_Dataset_Singapore/0001/Happy
             happy_wav = glob.glob("{}/*/Happy/*.wav".format(self.data_path))
             angry_wav = glob.glob("{}/*/Angry/*.wav".format(self.data_path))
             neutral_wav = glob.glob("{}/*/Neutral/*.wav".format(self.data_path))

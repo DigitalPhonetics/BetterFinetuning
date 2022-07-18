@@ -4,8 +4,11 @@ https://github.com/facebookresearch/barlowtwins/blob/main/main.py
 """
 import torch
 import torch.nn as nn
+from transformers import HubertModel
 from transformers import Wav2Vec2Model
 from transformers.models.wav2vec2.modeling_wav2vec2 import _compute_mask_indices
+
+import Training.config as config
 
 
 def off_diagonal(x):
@@ -30,8 +33,16 @@ class BarlowTwins(nn.Module):
         # linear layer as projector
         # self.linear_layer = nn.Sequential(nn.Linear(1024, 64))
         self.dropout = nn.Sequential(nn.Dropout(0.5))
-        self.wav2vec_model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
-        self.wav2vec_model.fc = nn.Identity()
+        if config.backbone == "wav2vec2":
+            self.backbone = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
+            self.backbone.fc = nn.Identity()
+        elif config.backbone == "hubert":
+            self.backbone = HubertModel.from_pretrained("facebook/hubert-base")
+            self.backbone.fc = nn.Identity()
+        else:
+            import sys
+            print("Invalid backbone selected!")
+            sys.exit()
         # We will try to use projector in the original paper
         # 3-layers projector
         proj_layers = []
@@ -51,7 +62,7 @@ class BarlowTwins(nn.Module):
     def forward(self, input_1, input_2):
         # compute masked indices
         batch_size, raw_sequence_length = input_1.shape
-        sequence_length = self.wav2vec_model._get_feat_extract_output_lengths(
+        sequence_length = self.backbone._get_feat_extract_output_lengths(
             raw_sequence_length
         )
         mask_time_indices = _compute_mask_indices(
@@ -62,7 +73,7 @@ class BarlowTwins(nn.Module):
         # compute masked indices
         n = input_1.shape[0]
         # print("n: \n", n) # 32
-        output_1 = self.wav2vec_model(
+        output_1 = self.backbone(
             input_1, mask_time_indices=mask_time_indices
         ).extract_features  # [32, 2, 512]
         output_1 = output_1.reshape(n, -1)  # [32, 1024]
@@ -74,7 +85,7 @@ class BarlowTwins(nn.Module):
         # output_1 = self.linear_layer(output_1)  # [32, 64]
         output_1 = self.projector(output_1)
 
-        output_2 = self.wav2vec_model(
+        output_2 = self.backbone(
             input_2, mask_time_indices=mask_time_indices
         ).extract_features
         # TODO: remove reshape perphas
@@ -102,7 +113,7 @@ class BarlowTwins(nn.Module):
 
 class BarlowTwins_Contrastive(nn.Module):
     def __init__(
-        self, output_size, lambd, triplet_margin, barlowtwins_lambd, batch_size, device
+            self, output_size, lambd, triplet_margin, barlowtwins_lambd, batch_size, device
     ):
         super().__init__()
         self.output_size = output_size
@@ -116,8 +127,15 @@ class BarlowTwins_Contrastive(nn.Module):
         # linear layer as projector
         # self.linear_layer = nn.Sequential(nn.Linear(1024, 64))
         self.dropout = nn.Sequential(nn.Dropout(0.5))
-        self.wav2vec_model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
-        # self.wav2vec_model.fc = nn.Identity()
+        if config.backbone == "wav2vec2":
+            self.backbone = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
+        elif config.backbone == "hubert":
+            self.backbone = HubertModel.from_pretrained("facebook/hubert-base")
+        else:
+            import sys
+            print("Invalid backbone selected!")
+            sys.exit()
+        # self.backbone.fc = nn.Identity()
         # 3-layers projector
         proj_layers = []
         for layer in range(3):
@@ -137,7 +155,7 @@ class BarlowTwins_Contrastive(nn.Module):
         # compute masked indices
         n = anchor.shape[0]
         batch_size, raw_sequence_length = anchor.shape
-        sequence_length = self.wav2vec_model._get_feat_extract_output_lengths(
+        sequence_length = self.backbone._get_feat_extract_output_lengths(
             raw_sequence_length
         )
         mask_time_indices = _compute_mask_indices(
@@ -145,21 +163,21 @@ class BarlowTwins_Contrastive(nn.Module):
         )
         mask_time_indices = torch.from_numpy(mask_time_indices).to(self.device)
 
-        anchor_out = self.wav2vec_model(
+        anchor_out = self.backbone(
             anchor, mask_time_indices=mask_time_indices
         ).extract_features
         anchor_out = self.dropout(anchor_out)
         anchor_out = anchor_out.reshape(n, -1)
         anchor_out = self.projector(anchor_out)
 
-        positive_out = self.wav2vec_model(
+        positive_out = self.backbone(
             positive, mask_time_indices=mask_time_indices
         ).extract_features
         positive_out = self.dropout(positive_out)
         positive_out = positive_out.reshape(n, -1)
         positive_out = self.projector(positive_out)
 
-        negative_out = self.wav2vec_model(
+        negative_out = self.backbone(
             negative, mask_time_indices=mask_time_indices
         ).extract_features
         negative_out = self.dropout(negative_out)

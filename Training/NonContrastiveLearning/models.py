@@ -4,8 +4,11 @@ https://github.com/facebookresearch/barlowtwins/blob/main/main.py
 """
 import torch
 import torch.nn as nn
+from transformers import HubertModel
 from transformers import Wav2Vec2Model
 from transformers.models.wav2vec2.modeling_wav2vec2 import _compute_mask_indices
+
+import Training.config as config
 
 
 def off_diagonal(x):
@@ -30,8 +33,16 @@ class BarlowTwins(nn.Module):
         # linear layer as projector
         # self.linear_layer = nn.Sequential(nn.Linear(1024, 64))
         self.dropout = nn.Sequential(nn.Dropout(0.5))
-        self.wav2vec_model = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
-        self.wav2vec_model.fc = nn.Identity()
+        if config.backbone == "wav2vec2":
+            self.backbone = Wav2Vec2Model.from_pretrained("facebook/wav2vec2-base")
+            self.backbone.fc = nn.Identity()
+        elif config.backbone == "hubert":
+            self.backbone = HubertModel.from_pretrained("facebook/hubert-base")
+            self.backbone.fc = nn.Identity()
+        else:
+            import sys
+            print("Invalid backbone selected!")
+            sys.exit()
         # We will try to use projector in the original paper
         # 3-layers projector
         proj_layers = []
@@ -51,7 +62,7 @@ class BarlowTwins(nn.Module):
     def forward(self, input_1, input_2):
         # compute masked indices
         batch_size, raw_sequence_length = input_1.shape
-        sequence_length = self.wav2vec_model._get_feat_extract_output_lengths(
+        sequence_length = self.backbone._get_feat_extract_output_lengths(
             raw_sequence_length
         )
         mask_time_indices = _compute_mask_indices(
@@ -61,7 +72,7 @@ class BarlowTwins(nn.Module):
 
         # compute masked indices
         n = input_1.shape[0]
-        output_1 = self.wav2vec_model(
+        output_1 = self.backbone(
             input_1, mask_time_indices=mask_time_indices
         ).extract_features  # [32, 2, 512]
         output_1 = output_1.reshape(n, -1)  # [32, 1024]
@@ -69,7 +80,7 @@ class BarlowTwins(nn.Module):
 
         output_1 = self.projector(output_1)
 
-        output_2 = self.wav2vec_model(
+        output_2 = self.backbone(
             input_2, mask_time_indices=mask_time_indices
         ).extract_features
         output_2 = output_2.reshape(n, -1)
